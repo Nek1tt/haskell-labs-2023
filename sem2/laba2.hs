@@ -1,6 +1,7 @@
 
 import Control.Monad.State
 
+
 type GreekData = [(String, [Integer])]
 
 greekDataA :: GreekData
@@ -69,9 +70,8 @@ queryGreek dt key = case lookup key dt of
 
 -- Now do the same whole thing, but using do-notation, since Maybe is a Monad
 queryGreekPro :: GreekData -> String -> Maybe Double
-queryGreekPro dt key = case lookup key dt of
-        Nothing -> Nothing
-        Just xs -> do
+queryGreekPro dt key = do
+            xs <- lookup key dt
             myTail <- tailMay xs
             myMax <- maximumMay myTail
             myHead <- headMay xs
@@ -81,14 +81,22 @@ queryGreekPro dt key = case lookup key dt of
 -- * a harder task. rewrite queryGreekPro, but without the do-notation, only using the (>>=) operator and its friends
 -- in other words, desugarize your notation
 queryGreekProPlus :: GreekData -> String -> Maybe Double
-queryGreekProPlus = undefined
+queryGreekProPlus dt key = 
+    lookup key dt >>= \xs -> 
+    tailMay xs >>= \myTail -> 
+    maximumMay myTail >>= \myMax -> 
+    headMay xs >>= \myHead -> 
+    fromIntegral myMax `divMay` fromIntegral myHead
 
 -- state monad
 
 type RandState = [Int]
 
 rollDice :: State RandState Int
-rollDice = state (\(x:xs) -> (x `mod` 6 + 1, xs))
+rollDice = do
+    currentState <- get
+    put (tail currentState)
+    return $ head currentState
 
 game :: State RandState String
 game = do
@@ -98,7 +106,7 @@ game = do
 
 runGame :: String
 runGame = evalState game startSeed
-    where startSeed = [4, 3, 5, 2, 1, 6]
+    where startSeed = [4, 5, 5, 2, 1, 6]
 
 -- see this program as example:
 {-
