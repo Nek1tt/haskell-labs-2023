@@ -31,15 +31,3 @@ AND WARE IN (
 SELECT MIN(PRICE) AS min_price, MAX(PRICE) AS max_price
 FROM `PRODUCT`
 WHERE WARE = 'Paper';
-
-
-SELECT 
-	ROUND(AVG(PRICE), 1) AS avg_price,
-	ROUND(SUM((PRICE - (SELECT AVG(PRICE) 
-	FROM `PRODUCT` 
-	WHERE WARE = 'Meat')) * 
-	(PRICE - (SELECT AVG(PRICE) 
-	FROM `PRODUCT`
-	WHERE WARE = 'Meat'))) / (COUNT(PRICE)), 1) AS variance_price
-FROM `PRODUCT`
-WHERE WARE = 'Meat';
